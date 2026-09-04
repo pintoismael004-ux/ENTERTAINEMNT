@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entertainment — Tienda</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--red:#E8152A;--red2:#C0101F;--white:#fff;--off:#F7F7F7;--gray:#EBEBEB;--dark:#0D0D0D;--text:#1A1A1A;--text2:#555;--text3:#999;--font-display:'Bebas Neue',sans-serif;--font-body:'Inter',sans-serif}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);background:var(--white);color:var(--text);overflow-x:hidden}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--gray);padding:0 5%;height:60px;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:var(--font-display);font-size:26px;letter-spacing:2px;color:var(--red)}
+.nav-logo span{color:var(--dark)}
+.cart-btn{background:var(--dark);color:#fff;border:none;padding:8px 18px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;position:relative}
+.cart-count{background:var(--red);color:#fff;border-radius:50%;width:18px;height:18px;font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:700}
+.hero{margin-top:60px;background:var(--dark);padding:60px 5%;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(232,21,42,.25),transparent 65%)}
+.hero-eyebrow{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:16px}
+.hero-title{font-family:var(--font-display);font-size:clamp(48px,8vw,90px);color:#fff;letter-spacing:2px;line-height:.95;margin-bottom:16px}
+.hero-title span{color:var(--red)}
+.hero-sub{font-size:15px;color:rgba(255,255,255,.5);max-width:420px;margin:0 auto}
+.section{padding:60px 5%}
+.section-eyebrow{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:10px}
+.section-title{font-family:var(--font-display);font-size:clamp(32px,5vw,52px);letter-spacing:1px;margin-bottom:32px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px}
+.card{background:#fff;border:1.5px solid var(--gray);border-radius:14px;overflow:hidden;transition:all .2s}
+.card:hover{border-color:var(--red);transform:translateY(-3px);box-shadow:0 10px 28px rgba(232,21,42,.1)}
+.card-header{padding:24px 20px 16px;border-bottom:1px solid var(--gray);position:relative}
+.card-badge{position:absolute;top:14px;right:14px;background:var(--red);color:#fff;font-size:9px;font-weight:700;letter-spacing:1px;padding:3px 9px;border-radius:99px;text-transform:uppercase}
+.card-icon{width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:12px}
+.card-name{font-family:var(--font-display);font-size:26px;letter-spacing:1px;margin-bottom:4px}
+.card-desc{font-size:12px;color:var(--text2);line-height:1.5}
+.card-body{padding:18px 20px}
+.card-price-label{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:4px}
+.card-price{font-family:var(--font-display);font-size:36px;letter-spacing:1px;color:var(--red)}
+.card-price span{font-family:var(--font-body);font-size:12px;color:var(--text3);font-weight:400}
+.card-feats{margin:12px 0;display:flex;flex-direction:column;gap:5px}
+.card-feat{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--text2)}
+.card-feat::before{content:"✓";color:var(--red);font-weight:700;font-size:12px;flex-shrink:0}
+.add-btn{display:block;width:100%;background:var(--dark);color:#fff;border:none;border-radius:8px;padding:11px;font-family:var(--font-body);font-size:13px;font-weight:600;cursor:pointer;text-align:center;transition:background .15s;margin-top:14px}
+.add-btn:hover{background:var(--red)}
+.add-btn.added{background:var(--red)}
+/* CARRITO SIDEBAR */
+.cart-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200}
+.cart-overlay.open{display:block}
+.cart-sidebar{position:fixed;top:0;right:-420px;width:420px;max-width:100vw;height:100vh;background:#fff;z-index:201;display:flex;flex-direction:column;transition:right .3s;box-shadow:-4px 0 20px rgba(0,0,0,.15)}
+.cart-sidebar.open{right:0}
+.cart-head{padding:20px;border-bottom:1px solid var(--gray);display:flex;align-items:center;justify-content:space-between}
+.cart-head h3{font-size:16px;font-weight:700}
+.close-btn{background:none;border:none;font-size:22px;cursor:pointer;color:var(--text2)}
+.cart-items{flex:1;overflow-y:auto;padding:16px}
+.cart-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--gray)}
+.cart-item:last-child{border-bottom:none}
+.ci-name{font-weight:600;font-size:14px}
+.ci-price{font-size:13px;color:var(--red);font-weight:700}
+.ci-remove{background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;padding:0 4px}
+.ci-remove:hover{color:var(--red)}
+.cart-empty{text-align:center;color:var(--text3);font-size:13px;padding:40px 20px}
+.cart-foot{padding:20px;border-top:1px solid var(--gray)}
+.cart-total{display:flex;justify-content:space-between;font-weight:700;font-size:15px;margin-bottom:14px}
+.checkout-btn{display:block;width:100%;background:var(--red);color:#fff;border:none;border-radius:8px;padding:14px;font-family:var(--font-body);font-size:14px;font-weight:700;cursor:pointer;text-align:center;transition:background .15s}
+.checkout-btn:hover{background:var(--red2)}
+.checkout-btn:disabled{opacity:.5;cursor:not-allowed}
+/* CHECKOUT MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;align-items:center;justify-content:center;padding:20px}
+.modal-bg.open{display:flex}
+.modal{background:#fff;border-radius:14px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto}
+.modal-head{padding:20px 24px;border-bottom:1px solid var(--gray);display:flex;align-items:center;justify-content:space-between}
+.modal-head h3{font-size:15px;font-weight:700}
+.modal-body{padding:24px}
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.fg label{font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--text3)}
+.fg input{padding:10px 12px;border:1.5px solid var(--gray);border-radius:8px;font-size:14px;color:var(--text);outline:none;transition:border .15s;font-family:var(--font-body)}
+.fg input:focus{border-color:var(--red)}
+.order-summary{background:var(--off);border-radius:8px;padding:14px;margin-bottom:16px;font-size:13px}
+.order-summary-title{font-weight:700;margin-bottom:8px}
+.order-item{display:flex;justify-content:space-between;color:var(--text2);padding:3px 0}
+.order-total{display:flex;justify-content:space-between;font-weight:700;color:var(--red);margin-top:8px;padding-top:8px;border-top:1px solid var(--gray)}
+.upload-area{border:2px dashed var(--gray);border-radius:8px;padding:24px;text-align:center;cursor:pointer;transition:border .15s;position:relative;margin-bottom:14px}
+.upload-area:hover,.upload-area.has-file{border-color:var(--red)}
+.upload-area input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-icon{font-size:32px;margin-bottom:8px}
+.upload-text{font-size:13px;color:var(--text2)}
+.upload-name{font-size:12px;color:var(--red);font-weight:600;margin-top:4px}
+.pay-info{background:#FFF8E1;border:1px solid #FFE082;border-radius:8px;padding:14px;margin-bottom:16px;font-size:13px;line-height:1.7}
+.pay-info strong{color:var(--dark)}
+.submit-btn{display:block;width:100%;background:var(--red);color:#fff;border:none;border-radius:8px;padding:14px;font-family:var(--font-body);font-size:14px;font-weight:700;cursor:pointer;transition:background .15s}
+.submit-btn:hover{background:var(--red2)}
+.submit-btn:disabled{opacity:.5;cursor:not-allowed}
+/* SUCCESS */
+.success-screen{text-align:center;padding:40px 24px}
+.success-icon{font-size:56px;margin-bottom:16px}
+.success-title{font-family:var(--font-display);font-size:32px;color:var(--dark);margin-bottom:8px}
+.success-sub{font-size:14px;color:var(--text2);line-height:1.7}
+/* FLOAT */
+.float-wpp{position:fixed;bottom:24px;right:24px;background:#25D366;color:#fff;border:none;border-radius:50px;padding:12px 18px;font-weight:600;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(37,211,102,.4);z-index:99;text-decoration:none;transition:all .2s}
+.float-wpp:hover{transform:scale(1.05)}
+.avail-chip{background:var(--off);border:1.5px solid var(--gray);border-radius:10px;padding:10px 14px;font-size:12px;font-weight:500;color:var(--text);text-align:center;transition:all .15s}
+.avail-chip:hover{border-color:var(--red);color:var(--red)}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--dark);color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+@media(max-width:600px){.cart-sidebar{width:100vw}.section{padding:50px 4%}nav{padding:0 4%}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script>emailjs.init("2C64B5g77xMEhAoh8");</script>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">ENT<span>ERTAINMENT</span></div>
+  <button class="cart-btn" onclick="toggleCart()">
+    🛒 Carrito <span class="cart-count" id="cart-count">0</span>
+  </button>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div style="position:relative;z-index:1">
+    <div class="hero-eyebrow">Streaming sin complicaciones</div>
+    <h1 class="hero-title">ELIGE TU<br><span>PLAN</span></h1>
+    <p class="hero-sub">Agrega al carrito y paga en minutos. Activación en menos de 24h.</p>
+  </div>
+</div>
+
+<!-- CONTACTO POR LÍNEA -->
+<section style="background:var(--dark);padding:20px 5%;display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap" id="contacto-linea">
+  <span style="color:rgba(255,255,255,.5);font-size:13px" id="contacto-label">¿Tienes dudas? Contáctanos:</span>
+  <a id="btn-contacto-wpp" href="#" target="_blank" style="background:#25D366;color:#fff;padding:8px 18px;border-radius:8px;font-weight:600;font-size:13px;text-decoration:none;display:inline-flex;align-items:center;gap:6px">💬 WhatsApp</a>
+  <a id="btn-contacto-correo" href="#" style="background:var(--bg3,#1e2023);color:#fff;padding:8px 18px;border-radius:8px;font-weight:600;font-size:13px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(255,255,255,.15)">✉️ Correo</a>
+</section>
+
+<!-- STREAMING -->
+<section class="section" id="streaming" style="background:var(--off)">
+  <div class="section-eyebrow">Plataformas de video</div>
+  <div class="section-title">STREAMING</div>
+  <div class="grid">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-badge">🔥 Popular</div>
+        <div class="card-icon" style="background:#1a1a1a">🎬</div>
+        <div class="card-name">NETFLIX</div>
+        <div class="card-desc">Series, películas y documentales para toda la familia.</div>
+      </div>
+      <div class="card-body">
+        <div class="card-price-label">Precio mensual</div>
+        <div class="card-price">$14.000<span> COP</span></div>
+        <div class="card-feats">
+          <div class="card-feat">Perfil individual</div>
+          <div class="card-feat">Activación en 24h</div>
+          <div class="card-feat">30 días garantizados</div>
+        </div>
+        <button class="add-btn" onclick="addCart('Netflix','14000')">+ Agregar al carrito</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:#0e1b4d">✨</div>
+        <div class="card-name">DISNEY+</div>
+        <div class="card-desc">Marvel, Star Wars, Pixar y National Geographic.</div>
+      </div>
+      <div class="card-body">
+        <div class="card-price-label">Precio mensual</div>
+        <div class="card-price">$12.000<span> COP</span></div>
+        <div class="card-feats">
+          <div class="card-feat">Perfil individual</div>
+          <div class="card-feat">Activación en 24h</div>
+          <div class="card-feat">30 días garantizados</div>
+        </div>
+        <button class="add-btn" onclick="addCart('Disney+','12000')">+ Agregar al carrito</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:#00A8E0">📦</div>
+        <div class="card-name">PRIME VIDEO</div>
+        <div class="card-desc">Series originales y estrenos exclusivos de Amazon.</div>
+      </div>
+      <div class="card-body">
+        <div class="card-price-label">Precio mensual</div>
+        <div class="card-price">$7.000<span> COP</span></div>
+        <div class="card-feats">
+          <div class="card-feat">Perfil individual</div>
+          <div class="card-feat">Activación en 24h</div>
+          <div class="card-feat">30 días garantizados</div>
+        </div>
+        <button class="add-btn" onclick="addCart('Prime Video','7000')">+ Agregar al carrito</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:#002BE7">🎭</div>
+        <div class="card-name">MAX</div>
+        <div class="card-desc">HBO, Warner Bros y el mejor contenido premium.</div>
+      </div>
+      <div class="card-body">
+        <div class="card-price-label">Precio mensual</div>
+        <div class="card-price">$6.000<span> COP</span></div>
+        <div class="card-feats">
+          <div class="card-feat">Perfil individual</div>
+          <div class="card-feat">Activación en 24h</div>
+          <div class="card-feat">30 días garantizados</div>
+        </div>
+        <button class="add-btn" onclick="addCart('Max','6000')">+ Agregar al carrito</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:#F47521">⛩️</div>
+        <div class="card-name">CRUNCHYROLL</div>
+        <div class="card-desc">El catálogo de anime más grande, en español.</div>
+      </div>
+      <div class="card-body">
+        <div class="card-price-label">Precio mensual</div>
+        <div class="card-price">$8.000<span> COP</span></div>
+        <div class="card-feats">
+          <div class="card-feat">Perfil individual</div>
+          <div class="card-feat">Activación en 24h</div>
+          <div class="card-feat">30 días garantizados</div>
+        </div>
+        <button class="add-btn" onclick="addCart('Crunchyroll','8000')">+ Agregar al carrito</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MÚSICA -->
+<section class="section">
+  <div class="section-eyebrow">Música sin límites</div>
+  <div class="section-title">MÚSICA</div>
+  <div class="grid">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-badge" style="background:#1DB954">🎵 Disponibilidad</div>
+        <div class="card-icon" style="background:#1DB954">🎧</div>
+        <div class="card-name">SPOTIFY</div>
+        <div class="card-desc">Música sin anuncios, modo sin conexión y calidad premium.</div>
+      </div>
+      <div class="card-body">
+        <div class="card-price-label">Precio</div>
+        <div class="card-price" style="font-size:22px;margin-bottom:8px">Bajo disponibilidad</div>
+        <div class="card-feats">
+          <div class="card-feat">Sin anuncios</div>
+          <div class="card-feat">Descarga sin internet</div>
+          <div class="card-feat">30 días garantizados</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
+          <a href="https://wa.me/573019571449?text=Hola!%20Me%20interesa%20Spotify%20Premium.%20%C2%BFHay%20disponibilidad?" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:5px;padding:9px;border-radius:8px;font-size:11px;font-weight:600;background:#1a1a1a;color:#fff;text-decoration:none">💬 Mayra</a>
+          <a href="https://wa.me/573046817427?text=Hola!%20Me%20interesa%20Spotify%20Premium.%20%C2%BFHay%20disponibilidad?" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:5px;padding:9px;border-radius:8px;font-size:11px;font-weight:600;background:#1a1a1a;color:#fff;text-decoration:none">💬 Laura</a>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-badge" style="background:#FF0000">▶ Disponibilidad</div>
+        <div class="card-icon" style="background:#FF0000">▶️</div>
+        <div class="card-name">YOUTUBE PREMIUM</div>
+        <div class="card-desc">Sin anuncios, YouTube Music incluido y reproducción en fondo.</div>
+      </div>
+      <div class="card-body">
+        <div class="card-price-label">Precio</div>
+        <div class="card-price" style="font-size:22px;margin-bottom:8px">Bajo disponibilidad</div>
+        <div class="card-feats">
+          <div class="card-feat">Sin anuncios</div>
+          <div class="card-feat">YouTube Music incluido</div>
+          <div class="card-feat">30 días garantizados</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
+          <a href="https://wa.me/573019571449?text=Hola!%20Me%20interesa%20YouTube%20Premium.%20%C2%BFHay%20disponibilidad?" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:5px;padding:9px;border-radius:8px;font-size:11px;font-weight:600;background:#1a1a1a;color:#fff;text-decoration:none">💬 Mayra</a>
+          <a href="https://wa.me/573046817427?text=Hola!%20Me%20interesa%20YouTube%20Premium.%20%C2%BFHay%20disponibilidad?" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:5px;padding:9px;border-radius:8px;font-size:11px;font-weight:600;background:#1a1a1a;color:#fff;text-decoration:none">💬 Laura</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMBOS -->
+<section class="section" style="background:var(--off)">
+  <div class="section-eyebrow">Ahorra más</div>
+  <div class="section-title">COMBOS</div>
+  <div class="grid">
+    <div class="card" style="border-color:#E8152A">
+      <div class="card-header" style="border-bottom-color:rgba(232,21,42,.15)">
+        <div class="card-badge">⭐ Más popular</div>
+        <div class="card-icon" style="background:#E8152A">🎯</div>
+        <div class="card-name">NETFLIX + DISNEY+</div>
+        <div class="card-desc">Lo mejor del streaming en un solo pago mensual.</div>
+      </div>
+      <div class="card-body">
+        <div class="card-price-label">Precio mensual</div>
+        <div class="card-price">$24.000<span> COP</span></div>
+        <div class="card-feats">
+          <div class="card-feat">Netflix perfil individual</div>
+          <div class="card-feat">Disney+ perfil individual</div>
+          <div class="card-feat">30 días garantizados</div>
+        </div>
+        <button class="add-btn" onclick="addCart('Combo Netflix + Disney+','24000')" style="background:#E8152A">+ Agregar al carrito</button>
+      </div>
+    </div>
+    <div class="card" style="border-color:#E8152A">
+      <div class="card-header" style="border-bottom-color:rgba(232,21,42,.15)">
+        <div class="card-badge" style="background:#0d0d0d">🔥 Todo incluido</div>
+        <div class="card-icon" style="background:#0d0d0d">🎬</div>
+        <div class="card-name">NETFLIX + DISNEY+ + MAX</div>
+        <div class="card-desc">El combo completo para toda la familia.</div>
+      </div>
+      <div class="card-body">
+        <div class="card-price-label">Precio mensual</div>
+        <div class="card-price">$28.000<span> COP</span></div>
+        <div class="card-feats">
+          <div class="card-feat">Netflix perfil individual</div>
+          <div class="card-feat">Disney+ perfil individual</div>
+          <div class="card-feat">Max perfil individual</div>
+          <div class="card-feat">30 días garantizados</div>
+        </div>
+        <button class="add-btn" onclick="addCart('Combo Netflix + Disney+ + Max','28000')" style="background:#0d0d0d">+ Agregar al carrito</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-badge" style="background:#555">✨ Personalizado</div>
+        <div class="card-icon" style="background:#555">🛠</div>
+        <div class="card-name">COMBO A TU MEDIDA</div>
+        <div class="card-desc">Elige las plataformas que quieras y te damos el mejor precio.</div>
+      </div>
+      <div class="card-body">
+        <div class="card-price-label">Precio</div>
+        <div class="card-price" style="font-size:20px;margin-bottom:8px">Cotización personalizada</div>
+        <div class="card-feats">
+          <div class="card-feat">Cualquier combinación</div>
+          <div class="card-feat">Precio especial por combo</div>
+          <div class="card-feat">30 días garantizados</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
+          <a href="https://wa.me/573019571449?text=Hola!%20Quiero%20armar%20un%20combo%20personalizado.%20%C2%BFCu%C3%A1les%20opciones%20tienen?" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:5px;padding:9px;border-radius:8px;font-size:11px;font-weight:600;background:#1a1a1a;color:#fff;text-decoration:none">💬 Mayra</a>
+          <a href="https://wa.me/573046817427?text=Hola!%20Quiero%20armar%20un%20combo%20personalizado.%20%C2%BFCu%C3%A1les%20opciones%20tienen?" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:5px;padding:9px;border-radius:8px;font-size:11px;font-weight:600;background:#1a1a1a;color:#fff;text-decoration:none">💬 Laura</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MÁS PLATAFORMAS -->
+<section class="section" style="background:var(--off)">
+  <div class="section-eyebrow">¿No ves lo que buscas?</div>
+  <div class="section-title">HAY MÁS</div>
+  <p style="font-size:14px;color:var(--text2);max-width:500px;margin-bottom:28px;line-height:1.7">Pregunta disponibilidad por WhatsApp.</p>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:32px">
+    <div class="avail-chip">🎮 Xbox Game Pass</div>
+    <div class="avail-chip">🎵 Apple Music</div>
+    <div class="avail-chip">📺 Paramount+</div>
+    <div class="avail-chip">🎬 Mubi</div>
+    <div class="avail-chip">🏆 DAZN</div>
+    <div class="avail-chip">🎵 Deezer</div>
+    <div class="avail-chip">📖 Scribd</div>
+    <div class="avail-chip">🎮 EA Play</div>
+    <div class="avail-chip" style="background:var(--red);color:#fff;border-color:var(--red)">+ Y más...</div>
+  </div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap">
+    <a href="https://wa.me/573019571449?text=Hola!%20Quiero%20preguntar%20disponibilidad" target="_blank" style="background:var(--dark);color:#fff;padding:12px 22px;border-radius:8px;font-weight:600;font-size:13px;text-decoration:none;display:inline-flex;align-items:center;gap:8px">💬 Mayra</a>
+    <a href="https://wa.me/573046817427?text=Hola!%20Quiero%20preguntar%20disponibilidad" target="_blank" style="background:var(--dark);color:#fff;padding:12px 22px;border-radius:8px;font-weight:600;font-size:13px;text-decoration:none;display:inline-flex;align-items:center;gap:8px">💬 Laura</a>
+  </div>
+</section>
+
+<!-- CARRITO SIDEBAR -->
+<div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
+<div class="cart-sidebar" id="cart-sidebar">
+  <div class="cart-head">
+    <h3>🛒 Tu carrito</h3>
+    <button class="close-btn" onclick="toggleCart()">×</button>
+  </div>
+  <div class="cart-items" id="cart-items">
+    <div class="cart-empty">Tu carrito está vacío</div>
+  </div>
+  <div class="cart-foot" id="cart-foot" style="display:none">
+    <div class="cart-total"><span>Total</span><span id="cart-total-val" style="color:var(--red)">$0</span></div>
+    <button class="checkout-btn" onclick="openCheckout()">Proceder al pago →</button>
+  </div>
+</div>
+
+<!-- CHECKOUT MODAL -->
+<div class="modal-bg" id="modal-checkout">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>💳 Completar pedido</h3>
+      <button class="close-btn" onclick="closeCheckout()">×</button>
+    </div>
+    <div class="modal-body" id="checkout-body">
+      <!-- Resumen -->
+      <div class="order-summary">
+        <div class="order-summary-title">Resumen del pedido</div>
+        <div id="checkout-items"></div>
+        <div class="order-total"><span>Total</span><span id="checkout-total"></span></div>
+      </div>
+      <!-- Datos del cliente -->
+      <div class="fg"><label>Nombre completo</label><input id="ch-nombre" placeholder="Tu nombre"></div>
+      <div class="fg"><label>WhatsApp</label><div style="display:flex;align-items:center;background:var(--off);border:1.5px solid var(--gray);border-radius:8px;overflow:hidden"><span style="padding:10px 10px;font-size:14px;color:var(--text2);background:var(--gray);white-space:nowrap;font-weight:600">+57</span><input id="ch-wpp" placeholder="3001234567" type="tel" maxlength="10" style="border:none;border-radius:0;background:var(--off);flex:1;padding:10px 10px;font-size:14px;outline:none"></div></div>
+      <div class="fg"><label>Correo electrónico</label><input id="ch-correo" placeholder="tucorreo@gmail.com" type="email"></div>
+      <!-- Info de pago -->
+      <div class="pay-info" id="pay-info-block">
+        Cargando datos de pago...
+      </div>
+      <!-- Comprobante -->
+      <div class="upload-area" id="upload-area">
+        <input type="file" accept="image/*,.pdf" id="comprobante-input" onchange="handleFile(this)">
+        <div class="upload-icon">📎</div>
+        <div class="upload-text">Sube tu comprobante de pago</div>
+        <div class="upload-name" id="upload-name"></div>
+      </div>
+      <button class="submit-btn" id="submit-btn" onclick="enviarPedido()">✅ Enviar pedido</button>
+    </div>
+    <!-- SUCCESS -->
+    <div class="success-screen" id="success-screen" style="display:none">
+      <div class="success-icon">🎉</div>
+      <div class="success-title">PEDIDO ENVIADO</div>
+      <p class="success-sub">Recibimos tu pedido y comprobante. Lo revisamos y en menos de <strong>24 horas</strong> te enviamos tus credenciales por WhatsApp y correo.<br><br>¡Gracias por preferirnos!</p>
+      <button onclick="closeCheckout()" style="margin-top:20px;background:var(--red);color:#fff;border:none;padding:12px 28px;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<a id="float-wpp-link" href="https://wa.me/573019571449" target="_blank" class="float-wpp">💬 WhatsApp</a>
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== LINEAS =====
+var urlParams = new URLSearchParams(window.location.search);
+var lineaActual = (urlParams.get('linea') || 'ismael').toLowerCase();
+var LINEAS = {
+  ismael: { nombre:"Ismael Pinto",  llave:"3212302998", qr:"https://uylfsuajsbpzoxetungg.supabase.co/storage/v1/object/public/IMAGENES/WhatsApp%20Image%202026-08-27%20at%2010.05.09%20AM.jpeg", wpp:"573246612789", correo:"checheniaentertainment1999@gmail.com" },
+  mayra:  { nombre:"Mayra Ojeda",   llave:"3019571449", qr:"https://uylfsuajsbpzoxetungg.supabase.co/storage/v1/object/public/IMAGENES/WhatsApp%20Image%202026-09-03%20at%2011.40.25%20AM.jpeg", wpp:"573019571449", correo:"checheniaentertainment1999+mayra@gmail.com" },
+  laura:  { nombre:"Laura Tirado",  llave:"3008221070", qr:"https://uylfsuajsbpzoxetungg.supabase.co/storage/v1/object/public/IMAGENES/WhatsApp%20Image%202026-09-02%20at%2010.46.59%20AM.jpeg", wpp:"573046817427", correo:"checheniaentertainment1999+laura@gmail.com" }
+};
+var lineaInfo = LINEAS[lineaActual] || LINEAS.ismael;
+
+const SB_URL="https://uylfsuajsbpzoxetungg.supabase.co";
+const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5bGZzdWFqc2Jwem94ZXR1bmdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwMTM4MzQsImV4cCI6MjA5NTU4OTgzNH0.rQPyQceD_wzAQkXwvk0V4Gz9gnQPUqBhwQc3ChVQehs";
+const H={"Content-Type":"application/json","apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY};
+
+let cart=[];
+let comprobanteFile=null;
+const fm=n=>"$"+parseInt(n).toLocaleString("es-CO");
+
+function toast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg;t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),2500);
+}
+
+function addCart(name,price){
+  const exists=cart.find(i=>i.name===name);
+  if(exists){toast("Ya está en tu carrito");return;}
+  cart.push({name,price:parseInt(price)});
+  updateCartUI();
+  toggleCart();
+  toast("✓ "+name+" agregado");
+}
+
+function removeCart(name){
+  cart=cart.filter(i=>i.name!==name);
+  updateCartUI();
+}
+
+function updateCartUI(){
+  const count=cart.length;
+  document.getElementById("cart-count").textContent=count;
+  const itemsEl=document.getElementById("cart-items");
+  const footEl=document.getElementById("cart-foot");
+  if(count===0){
+    itemsEl.innerHTML='<div class="cart-empty">Tu carrito está vacío</div>';
+    footEl.style.display="none";
+    return;
+  }
+  footEl.style.display="block";
+  const total=cart.reduce((a,i)=>a+i.price,0);
+  itemsEl.innerHTML=cart.map(i=>`
+    <div class="cart-item">
+      <div><div class="ci-name">${i.name}</div><div class="ci-price">${fm(i.price)}/mes</div></div>
+      <button class="ci-remove" onclick="removeCart('${i.name}')">×</button>
+    </div>
+  `).join("");
+  document.getElementById("cart-total-val").textContent=fm(total);
+}
+
+function toggleCart(){
+  document.getElementById("cart-overlay").classList.toggle("open");
+  document.getElementById("cart-sidebar").classList.toggle("open");
+}
+
+function openCheckout(){
+  if(cart.length===0)return;
+  const total=cart.reduce((a,i)=>a+i.price,0);
+  document.getElementById("checkout-items").innerHTML=cart.map(i=>`<div class="order-item"><span>${i.name}</span><span>${fm(i.price)}</span></div>`).join("");
+  document.getElementById("checkout-total").textContent=fm(total);
+  document.getElementById("modal-checkout").classList.add("open");
+  document.getElementById("checkout-body").style.display="block";
+  document.getElementById("success-screen").style.display="none";
+  toggleCart();
+}
+
+function closeCheckout(){
+  document.getElementById("modal-checkout").classList.remove("open");
+}
+
+function handleFile(input){
+  if(input.files[0]){
+    comprobanteFile=input.files[0];
+    document.getElementById("upload-name").textContent="✓ "+comprobanteFile.name;
+    document.getElementById("upload-area").classList.add("has-file");
+  }
+}
+
+async function enviarPedido(){
+  const nombre=document.getElementById("ch-nombre").value.trim();
+  const wppRaw=document.getElementById("ch-wpp").value.trim().replace(/^0+/,"");
+const wpp="+57"+wppRaw;
+  const correo=document.getElementById("ch-correo").value.trim();
+  if(!nombre||!wppRaw||!correo){toast("Completa todos tus datos");return;}
+  if(!comprobanteFile){toast("Sube tu comprobante de pago");return;}
+  const btn=document.getElementById("submit-btn");
+  btn.disabled=true;btn.textContent="Enviando...";
+  try{
+    // Subir comprobante a Supabase Storage
+    const ext=comprobanteFile.name.split(".").pop();
+    const fileName=`${Date.now()}.${ext}`;
+    const uploadRes=await fetch(`${SB_URL}/storage/v1/object/comprobantes/${fileName}`,{
+      method:"POST",
+      headers:{"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Content-Type":comprobanteFile.type},
+      body:comprobanteFile
+    });
+    let comprobanteUrl="";
+    if(uploadRes.ok){
+      comprobanteUrl=`${SB_URL}/storage/v1/object/public/comprobantes/${fileName}`;
+    }
+    // Guardar pedido en Supabase
+    const total=cart.reduce((a,i)=>a+i.price,0);
+    await fetch(`${SB_URL}/rest/v1/pedidos`,{
+      method:"POST",
+      headers:{...H,"Prefer":"return=representation"},
+      body:JSON.stringify({
+        cliente_nombre:nombre,
+        cliente_wpp:wpp,
+        cliente_correo:correo,
+        items:cart,
+        total,
+        comprobante_url:comprobanteUrl,
+        estado:"pendiente",
+        linea:lineaInfo.nombre
+      })
+    });
+    // Notificar admin por correo
+try {
+  await emailjs.send("service_jhgloju", "template_9q9z667", {
+    cliente_nombre: "🔔 NUEVO PEDIDO de " + nombre,
+    cliente_correo: "checheniaentertainment1999@gmail.com",
+    credenciales: "Cliente: " + nombre + "\nWPP: " + wpp + "\nProductos: " + cart.map(i=>i.name).join(", ") + "\nTotal: $" + total.toLocaleString("es-CO"),
+    servicio: cart.map(i=>i.name).join(", "),
+    total: "$" + total.toLocaleString("es-CO")
+  });
+} catch(e) { console.log("Error notificando admin", e); }
+
+// Notificar admin por WhatsApp — número de pedidos
+var adminMsg = "🔔 NUEVO PEDIDO!\n\nCliente: " + nombre + "\nWPP: " + wpp + "\nCorreo: " + correo + "\nProductos: " + cart.map(i=>i.name).join(", ") + "\nTotal: $" + total.toLocaleString("es-CO") + "\n\nRevisa el panel admin.";
+var adminWppLink = "https://wa.me/573246612789?text=" + encodeURIComponent(adminMsg);
+    // Link de WhatsApp de la línea correspondiente
+    var lineaWppLink = "https://wa.me/" + lineaInfo.wpp + "?text=" + encodeURIComponent(adminMsg);
+    // Mostrar éxito con botón WhatsApp visible
+    cart=[];
+    updateCartUI();
+    document.getElementById("checkout-body").style.display="none";
+    var ss = document.getElementById("success-screen");
+    ss.style.display="block";
+    ss.innerHTML = '<div class="success-icon">🎉</div><div class="success-title">PEDIDO ENVIADO</div><p class="success-sub">Recibimos tu pedido y comprobante. Lo revisamos y en menos de <strong>24 horas</strong> te enviamos tus credenciales por WhatsApp y correo.<br><br>¡Gracias por preferirnos!</p><a href="' + lineaWppLink + '" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;padding:12px 22px;border-radius:8px;font-weight:700;font-size:13px;text-decoration:none;margin-top:16px">💬 Confirmar pedido con ' + lineaInfo.nombre + '</a><button onclick="closeCheckout()" style="display:block;margin:12px auto 0;background:var(--dark);color:#fff;border:none;padding:10px 24px;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px">Cerrar</button>';
+  }catch(e){
+    toast("Error al enviar. Intenta de nuevo.");
+  }
+  btn.disabled=false;btn.textContent="✅ Enviar pedido";
+}
+
+// ===== INIT LINEA =====
+function initLinea(){
+  var p=document.getElementById("pay-info-block");
+  if(p){
+    var qr=lineaInfo.qr?'<br><img src="'+lineaInfo.qr+'" style="width:160px;border-radius:8px;margin-top:10px;display:block">':'';
+    p.innerHTML='<strong>📲 Datos para transferir a '+lineaInfo.nombre+':</strong><br>Llave: <strong>'+lineaInfo.llave+'</strong><br>Titular: <strong>'+lineaInfo.nombre+'</strong><br><br>Transfiere el valor exacto y sube el comprobante aquí abajo.'+qr;
+  }
+  var f=document.getElementById("float-wpp-link");
+  if(f) f.href="https://wa.me/"+lineaInfo.wpp;
+  // Botones de contacto por línea
+  var btnWpp=document.getElementById("btn-contacto-wpp");
+  var btnCorreo=document.getElementById("btn-contacto-correo");
+  var lblContacto=document.getElementById("contacto-label");
+  if(btnWpp) btnWpp.href="https://wa.me/"+lineaInfo.wpp+"?text=Hola%20"+lineaInfo.nombre+"%2C%20tengo%20una%20duda%20sobre%20los%20servicios";
+  if(btnCorreo) btnCorreo.href="mailto:"+lineaInfo.correo+"?subject=Consulta%20Entertainment";
+  if(lblContacto) lblContacto.textContent="¿Tienes dudas? Habla con "+lineaInfo.nombre+":";
+}
+initLinea();
+</script>
+</body>
+</html>
