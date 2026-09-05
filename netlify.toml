@@ -2,11 +2,11 @@
 publish = "."
 
 [[redirects]]
-  from = "/"
-  to = "/index.html"
+  from = "/sistema"
+  to = "/sistema_entertainment.html"
   status = 200
 
 [[redirects]]
-  from = "/sistema"
+  from = "/admin"
   to = "/sistema_entertainment.html"
   status = 200
