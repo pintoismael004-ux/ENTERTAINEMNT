@@ -175,6 +175,7 @@ body{font-family:var(--font-head);background:var(--bg);color:var(--text);min-hei
       <div class="card-title" style="color:var(--amber)">⚠️ Cierre de mes</div>
       <div style="font-size:13px;color:var(--text2);margin-bottom:10px">Archiva todos los movimientos del mes. Podrás consultarlos en Historial.</div>
       <button class="btn warn" onclick="abrirCierreMes()">📦 Cerrar mes actual</button>
+      <button class="btn danger" onclick="eliminarTodosLosRegistros()" style="background:var(--red);color:#000;border-color:var(--red);font-weight:600;margin-top:8px;display:block">🗑 Eliminar todos los registros</button>
     </div>
   </div>
 
@@ -867,6 +868,20 @@ async function confirmarCierre(){
     toast("✓ Mes cerrado y archivado");
   }catch(e){toast("Error al cerrar mes","err");}
   btn.disabled=false;btn.textContent="✅ Confirmar cierre";
+}
+
+async function eliminarTodosLosRegistros(){
+  if(!confirm("¿Estás seguro? Esta acción eliminará TODOS los movimientos y clientes permanentemente y no se puede deshacer."))return;
+  var palabra=prompt("Escribe la palabra ELIMINAR para confirmar:");
+  if(palabra===null)return;
+  if(palabra.trim()!=="ELIMINAR"){toast("Confirmación incorrecta. No se eliminó nada.","err");return;}
+  try{
+    await sb("movimientos?id=not.is.null","DELETE");
+    await sb("clientes?id=not.is.null","DELETE");
+    movs=[];clientes=[];historialMovs=[];
+    renderPanel();renderClientes();renderMovimientos();renderFinanzas();
+    toast("✓ Todos los registros fueron eliminados");
+  }catch(e){toast("Error al eliminar: "+e.message,"err");}
 }
 
 // ===== HISTORIAL =====
