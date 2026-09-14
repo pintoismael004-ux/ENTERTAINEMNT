@@ -156,9 +156,27 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,
     </div>
     <div class="card">
       <div class="card-header">
+        <div class="card-badge">⭐ Original</div>
+        <div class="card-icon" style="background:#1a1a1a">🎬</div>
+        <div class="card-name">NETFLIX ORIGINAL</div>
+        <div class="card-desc">Cuenta original de Netflix, sin compartir perfiles.</div>
+      </div>
+      <div class="card-body">
+        <div class="card-price-label">Precio mensual</div>
+        <div class="card-price">$21.000<span> COP</span></div>
+        <div class="card-feats">
+          <div class="card-feat">Cuenta original</div>
+          <div class="card-feat">Activación en 24h</div>
+          <div class="card-feat">30 días garantizados</div>
+        </div>
+        <button class="add-btn" onclick="addCart('Netflix Original','21000')">+ Agregar al carrito</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
         <div class="card-icon" style="background:#0e1b4d">✨</div>
-        <div class="card-name">DISNEY+</div>
-        <div class="card-desc">Marvel, Star Wars, Pixar y National Geographic.</div>
+        <div class="card-name">DISNEY+ STAR+ ESPN</div>
+        <div class="card-desc">Marvel, Star Wars, Pixar, National Geographic y ESPN.</div>
       </div>
       <div class="card-body">
         <div class="card-price-label">Precio mensual</div>
@@ -168,13 +186,13 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,
           <div class="card-feat">Activación en 24h</div>
           <div class="card-feat">30 días garantizados</div>
         </div>
-        <button class="add-btn" onclick="addCart('Disney+','12000')">+ Agregar al carrito</button>
+        <button class="add-btn" onclick="addCart('Disney+ Star+ ESPN','12000')">+ Agregar al carrito</button>
       </div>
     </div>
     <div class="card">
       <div class="card-header">
         <div class="card-icon" style="background:#00A8E0">📦</div>
-        <div class="card-name">PRIME VIDEO</div>
+        <div class="card-name">AMAZON PRIME</div>
         <div class="card-desc">Series originales y estrenos exclusivos de Amazon.</div>
       </div>
       <div class="card-body">
@@ -185,13 +203,13 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,
           <div class="card-feat">Activación en 24h</div>
           <div class="card-feat">30 días garantizados</div>
         </div>
-        <button class="add-btn" onclick="addCart('Prime Video','7000')">+ Agregar al carrito</button>
+        <button class="add-btn" onclick="addCart('Amazon Prime','7000')">+ Agregar al carrito</button>
       </div>
     </div>
     <div class="card">
       <div class="card-header">
         <div class="card-icon" style="background:#002BE7">🎭</div>
-        <div class="card-name">MAX</div>
+        <div class="card-name">HBO MAX</div>
         <div class="card-desc">HBO, Warner Bros y el mejor contenido premium.</div>
       </div>
       <div class="card-body">
@@ -202,7 +220,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,
           <div class="card-feat">Activación en 24h</div>
           <div class="card-feat">30 días garantizados</div>
         </div>
-        <button class="add-btn" onclick="addCart('Max','6000')">+ Agregar al carrito</button>
+        <button class="add-btn" onclick="addCart('HBO Max','6000')">+ Agregar al carrito</button>
       </div>
     </div>
     <div class="card">
@@ -282,39 +300,76 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,
   <div class="grid">
     <div class="card" style="border-color:#E8152A">
       <div class="card-header" style="border-bottom-color:rgba(232,21,42,.15)">
-        <div class="card-badge">⭐ Más popular</div>
         <div class="card-icon" style="background:#E8152A">🎯</div>
-        <div class="card-name">NETFLIX + DISNEY+</div>
-        <div class="card-desc">Lo mejor del streaming en un solo pago mensual.</div>
+        <div class="card-name">COMBO #1</div>
+        <div class="card-desc">Disney+ Star+ y Max en un solo pago mensual.</div>
       </div>
       <div class="card-body">
         <div class="card-price-label">Precio mensual</div>
-        <div class="card-price">$24.000<span> COP</span></div>
+        <div class="card-price">$15.000<span> COP</span></div>
         <div class="card-feats">
-          <div class="card-feat">Netflix perfil individual</div>
-          <div class="card-feat">Disney+ perfil individual</div>
+          <div class="card-feat">Disney+ Star+ perfil individual</div>
+          <div class="card-feat">Max perfil individual</div>
           <div class="card-feat">30 días garantizados</div>
         </div>
-        <button class="add-btn" onclick="addCart('Combo Netflix + Disney+','24000')" style="background:#E8152A">+ Agregar al carrito</button>
+        <button class="add-btn" onclick="addCart('Combo #1 (Disney+ Star+ Max)','15000')" style="background:#E8152A">+ Agregar al carrito</button>
       </div>
     </div>
     <div class="card" style="border-color:#E8152A">
       <div class="card-header" style="border-bottom-color:rgba(232,21,42,.15)">
-        <div class="card-badge" style="background:#0d0d0d">🔥 Todo incluido</div>
+        <div class="card-icon" style="background:#E8152A">🎯</div>
+        <div class="card-name">COMBO #2</div>
+        <div class="card-desc">Netflix, Max y Amazon Prime en un solo pago mensual.</div>
+      </div>
+      <div class="card-body">
+        <div class="card-price-label">Precio mensual</div>
+        <div class="card-price">$23.000<span> COP</span></div>
+        <div class="card-feats">
+          <div class="card-feat">Netflix perfil individual</div>
+          <div class="card-feat">Max perfil individual</div>
+          <div class="card-feat">Amazon Prime perfil individual</div>
+          <div class="card-feat">30 días garantizados</div>
+        </div>
+        <button class="add-btn" onclick="addCart('Combo #2 (Netflix Max Amazon)','23000')" style="background:#E8152A">+ Agregar al carrito</button>
+      </div>
+    </div>
+    <div class="card" style="border-color:#E8152A">
+      <div class="card-header" style="border-bottom-color:rgba(232,21,42,.15)">
+        <div class="card-badge">⭐ Más popular</div>
         <div class="card-icon" style="background:#0d0d0d">🎬</div>
-        <div class="card-name">NETFLIX + DISNEY+ + MAX</div>
-        <div class="card-desc">El combo completo para toda la familia.</div>
+        <div class="card-name">COMBO DEL INFINITO</div>
+        <div class="card-desc">Netflix, Disney+ Star+ y Max para toda la familia.</div>
       </div>
       <div class="card-body">
         <div class="card-price-label">Precio mensual</div>
         <div class="card-price">$28.000<span> COP</span></div>
         <div class="card-feats">
           <div class="card-feat">Netflix perfil individual</div>
-          <div class="card-feat">Disney+ perfil individual</div>
+          <div class="card-feat">Disney+ Star+ perfil individual</div>
           <div class="card-feat">Max perfil individual</div>
           <div class="card-feat">30 días garantizados</div>
         </div>
-        <button class="add-btn" onclick="addCart('Combo Netflix + Disney+ + Max','28000')" style="background:#0d0d0d">+ Agregar al carrito</button>
+        <button class="add-btn" onclick="addCart('Combo del Infinito (Netflix Disney+ Star+ Max)','28000')" style="background:#0d0d0d">+ Agregar al carrito</button>
+      </div>
+    </div>
+    <div class="card" style="border-color:#E8152A">
+      <div class="card-header" style="border-bottom-color:rgba(232,21,42,.15)">
+        <div class="card-badge" style="background:#0d0d0d">🔥 Todo incluido</div>
+        <div class="card-icon" style="background:#0d0d0d">🎬</div>
+        <div class="card-name">COMBO DICIEMBRE</div>
+        <div class="card-desc">Netflix, Disney+ Star+, Max y Amazon Prime, el combo completo.</div>
+      </div>
+      <div class="card-body">
+        <div class="card-price-label">Precio mensual</div>
+        <div class="card-price">$33.000<span> COP</span></div>
+        <div class="card-feats">
+          <div class="card-feat">Netflix perfil individual</div>
+          <div class="card-feat">Disney+ Star+ perfil individual</div>
+          <div class="card-feat">Max perfil individual</div>
+          <div class="card-feat">Amazon Prime perfil individual</div>
+          <div class="card-feat">30 días garantizados</div>
+        </div>
+        <button class="add-btn" onclick="addCart('Combo Diciembre (Netflix Disney+ Star+ Max Amazon Prime)','33000')" style="background:#0d0d0d">+ Agregar al carrito</button>
       </div>
     </div>
     <div class="card">
