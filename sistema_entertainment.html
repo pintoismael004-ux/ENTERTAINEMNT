@@ -154,6 +154,7 @@ body{font-family:var(--font-head);background:var(--bg);color:var(--text);min-hei
       <button class="nb" onclick="go('movimientos')" id="t-movimientos">Movimientos</button>
       <button class="nb" onclick="go('renovaciones')" id="t-renovaciones">Renovaciones</button>
       <button class="nb" onclick="go('finanzas')" id="t-finanzas">Finanzas</button>
+      <button class="nb" onclick="go('estadisticas')" id="t-estadisticas">Estadísticas</button>
       <button class="nb" onclick="go('historial')" id="t-historial">Historial</button>
     </div>
     <button class="logout-btn" onclick="logout()">Salir</button>
@@ -292,6 +293,22 @@ body{font-family:var(--font-head);background:var(--bg);color:var(--text);min-hei
       <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:13px;font-weight:600;display:flex;justify-content:space-between">
         <span>Total retirado</span><span id="total-retiros" style="color:var(--purple);font-family:var(--font-mono)">$0</span>
       </div>
+    </div>
+  </div>
+
+  <!-- ESTADISTICAS -->
+  <div class="panel" id="p-estadisticas">
+    <div class="card">
+      <div class="card-title">🏆 Plataformas más vendidas</div>
+      <div id="stats-ranking"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📊 Ventas por línea</div>
+      <div id="stats-barchart"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">👥 Clientes activos por servicio</div>
+      <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Servicio</th><th>Clientes activos</th></tr></thead><tbody id="stats-clientes-servicio"></tbody></table></div>
     </div>
   </div>
 
@@ -453,6 +470,7 @@ function go(tab){
   if(tab==="movimientos") renderMovimientos();
   if(tab==="renovaciones") renderRenovaciones();
   if(tab==="finanzas") renderFinanzas();
+  if(tab==="estadisticas") renderEstadisticas();
   if(tab==="historial") initHistorial();
 }
 
@@ -882,6 +900,45 @@ async function eliminarTodosLosRegistros(){
     renderPanel();renderClientes();renderMovimientos();renderFinanzas();
     toast("✓ Todos los registros fueron eliminados");
   }catch(e){toast("Error al eliminar: "+e.message,"err");}
+}
+
+// ===== ESTADISTICAS =====
+function renderEstadisticas(){
+  // Ranking de plataformas más vendidas (por ventas registradas en movimientos)
+  var porServicioVenta={};
+  movs.filter(function(m){return m.tipo==="venta";}).forEach(function(m){
+    var k=m.cuenta||"Otro";
+    if(!porServicioVenta[k])porServicioVenta[k]={count:0,total:0};
+    porServicioVenta[k].count++;
+    porServicioVenta[k].total+=(m.valor||0);
+  });
+  var ranking=Object.keys(porServicioVenta).map(function(k){return{servicio:k,count:porServicioVenta[k].count,total:porServicioVenta[k].total};}).sort(function(a,b){return b.count-a.count||b.total-a.total;});
+  var medals=["🥇","🥈","🥉"];
+  document.getElementById("stats-ranking").innerHTML=ranking.length?ranking.map(function(r,i){
+    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:6px"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:15px;width:22px;text-align:center">'+(medals[i]||("#"+(i+1)))+'</span><span style="font-size:13px;font-weight:600">'+r.servicio+'</span></div><div style="display:flex;align-items:center;gap:14px"><span style="font-size:11px;color:var(--text3);font-family:var(--font-mono)">'+r.count+' venta'+(r.count===1?"":"s")+'</span><span style="font-size:12px;font-family:var(--font-mono);color:var(--green)">'+fm(r.total)+'</span></div></div>';
+  }).join(""):'<div class="empty">Sin ventas registradas</div>';
+
+  // Ventas por línea — gráfica de barras
+  var lineas=["Ismael","Mayra","Laura"];
+  var ventasLinea=lineas.map(function(l){
+    return{linea:l,total:movs.filter(function(m){return m.linea===l&&m.tipo==="venta";}).reduce(function(a,m){return a+(m.valor||0);},0)};
+  });
+  var maxV=Math.max.apply(null,ventasLinea.map(function(v){return v.total;}).concat([1]));
+  document.getElementById("stats-barchart").innerHTML=ventasLinea.map(function(v){
+    var pct=maxV>0?Math.round((v.total/maxV)*100):0;
+    return '<div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span style="font-weight:600">'+v.linea+'</span><span style="font-family:var(--font-mono);color:var(--green)">'+fm(v.total)+'</span></div><div style="height:14px;background:var(--bg4);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,var(--green2),var(--green));border-radius:4px;transition:width .3s"></div></div></div>';
+  }).join("");
+
+  // Clientes activos por servicio
+  var porServicioCliente={};
+  clientes.filter(function(c){return c.activo!==false;}).forEach(function(c){
+    var k=c.servicio||"Otro";
+    porServicioCliente[k]=(porServicioCliente[k]||0)+1;
+  });
+  var filas=Object.keys(porServicioCliente).map(function(k){return{servicio:k,total:porServicioCliente[k]};}).sort(function(a,b){return b.total-a.total;});
+  document.getElementById("stats-clientes-servicio").innerHTML=filas.length?filas.map(function(f){
+    return '<tr><td style="font-weight:600">'+f.servicio+'</td><td class="b">'+f.total+'</td></tr>';
+  }).join(""):'<tr><td colspan="2" class="empty">Sin clientes activos</td></tr>';
 }
 
 // ===== HISTORIAL =====
