@@ -606,7 +606,7 @@ const wpp="+57"+wppRaw;
     });
     // Notificar admin por correo
 try {
-  await emailjs.send("service_jhgloju", "template_9q9z667", {
+  await emailjs.send("service_5wwz5g8", "template_9q9z667", {
     cliente_nombre: "🔔 NUEVO PEDIDO de " + nombre,
     cliente_correo: "checheniaentertainment1999@gmail.com",
     credenciales: "Cliente: " + nombre + "\nWPP: " + wpp + "\nProductos: " + cart.map(i=>i.name).join(", ") + "\nTotal: $" + total.toLocaleString("es-CO"),
