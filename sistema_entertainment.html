@@ -152,6 +152,7 @@ body{font-family:var(--font-head);background:var(--bg);color:var(--text);min-hei
       <button class="nb" onclick="go('pedidos')" id="t-pedidos">Pedidos<span class="nb-alert" id="pedidos-badge" style="display:none">0</span></button>
       <button class="nb" onclick="go('clientes')" id="t-clientes">Clientes</button>
       <button class="nb" onclick="go('movimientos')" id="t-movimientos">Movimientos</button>
+      <button class="nb" onclick="go('cuentas')" id="t-cuentas">Cuentas</button>
       <button class="nb" onclick="go('renovaciones')" id="t-renovaciones">Renovaciones</button>
       <button class="nb" onclick="go('finanzas')" id="t-finanzas">Finanzas</button>
       <button class="nb" onclick="go('estadisticas')" id="t-estadisticas">Estadísticas</button>
@@ -250,6 +251,33 @@ body{font-family:var(--font-head);background:var(--bg);color:var(--text);min-hei
     <div class="card">
       <div class="card-title"><span>Movimientos</span><span id="mov-count" style="font-size:11px;color:var(--text3);font-family:var(--font-mono)"></span></div>
       <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Fecha</th><th>Línea</th><th>Descripción</th><th>Tipo</th><th>Valor</th><th>Destino</th><th></th></tr></thead><tbody id="tabla-mov"></tbody></table></div>
+    </div>
+  </div>
+
+  <!-- CUENTAS -->
+  <div class="panel" id="p-cuentas">
+    <div class="card">
+      <div class="card-title">Registrar cuenta</div>
+      <div class="fgrid">
+        <div class="fg"><label>Plataforma</label><select id="cu-plataforma"><option>Netflix</option><option>Disney+</option><option>HBO Max</option><option>Amazon Prime</option><option>Crunchyroll</option><option>Spotify</option><option>YouTube Premium</option></select></div>
+        <div class="fg"><label>Correo</label><input id="cu-correo" placeholder="correo@ejemplo.com"></div>
+        <div class="fg">
+          <label>Contraseña</label>
+          <div style="display:flex;gap:6px">
+            <input id="cu-pass" type="password" placeholder="Contraseña" style="flex:1;min-width:0">
+            <button type="button" class="btn sm" onclick="toggleCuentaPassInput()" id="btn-toggle-cu-pass">👁</button>
+          </div>
+        </div>
+        <div class="fg"><label>Pantallas totales</label><input id="cu-pantallas" type="number" placeholder="5"></div>
+        <div class="fg"><label>Línea</label><select id="cu-linea"><option>Ismael</option><option>Laura</option></select></div>
+      </div>
+      <div class="factions">
+        <button class="btn prim" id="btn-add-cuenta" onclick="addCuenta()">+ Registrar</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Cuentas registradas</div>
+      <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Plataforma</th><th>Correo</th><th>Contraseña</th><th>Línea</th><th>Pantallas totales</th><th>Ocupadas</th><th>Libres</th><th></th></tr></thead><tbody id="tabla-cuentas"></tbody></table></div>
     </div>
   </div>
 
@@ -378,8 +406,9 @@ var COSTOS = {
 var WPP_LINEAS = {Ismael:"573212302998",Mayra:"573019571449",Laura:"573046817427"};
 var WPP_NOMBRES = {Ismael:"Ismael",Mayra:"Mayra",Laura:"Laura"};
 
-var movs=[],clientes=[],gastosFijos=[],pedidos=[],historialMovs=[];
+var movs=[],clientes=[],gastosFijos=[],pedidos=[],historialMovs=[],cuentas=[];
 var movFiltroLinea="Todas",clienteFiltroLinea="Todas",pedidoFiltro="todos";
+var cuentaPassVisible={};
 var msgActual="";
 
 emailjs.init(EMAILJS_KEY);
@@ -438,9 +467,10 @@ async function loadAll(){
       sb("movimientos?archivado=eq.false&order=fecha.desc&limit=500"),
       sb("clientes?order=creado_en.desc&limit=500"),
       sb("gastos_fijos?order=creado_en.asc"),
-      sb("pedidos?order=creado_en.desc&limit=100")
+      sb("pedidos?order=creado_en.desc&limit=100"),
+      sb("cuentas?order=creado_en.desc&limit=500")
     ]);
-    movs=results[0];clientes=results[1];gastosFijos=results[2];pedidos=results[3];
+    movs=results[0];clientes=results[1];gastosFijos=results[2];pedidos=results[3];cuentas=results[4];
     setSyncStatus("ok","conectado");
     var pendientes=pedidos.filter(function(p){return p.estado==="pendiente";}).length;
     var badge=document.getElementById("pedidos-badge");
@@ -468,6 +498,7 @@ function go(tab){
   if(tab==="pedidos") renderPedidos();
   if(tab==="clientes") renderClientes();
   if(tab==="movimientos") renderMovimientos();
+  if(tab==="cuentas") renderCuentas();
   if(tab==="renovaciones") renderRenovaciones();
   if(tab==="finanzas") renderFinanzas();
   if(tab==="estadisticas") renderEstadisticas();
@@ -786,6 +817,50 @@ async function delMov(id){
   try{await sb("movimientos?id=eq."+id,"DELETE");movs=movs.filter(function(m){return m.id!==id;});renderMovimientos();renderPanel();toast("Eliminado");}catch(e){toast("Error","err");}
 }
 function clearMovForm(){document.getElementById("m-cuenta").value="";document.getElementById("m-valor").value="";document.getElementById("m-fecha").value=today();}
+
+// ===== CUENTAS =====
+function toggleCuentaPassInput(){
+  var i=document.getElementById("cu-pass");
+  i.type=i.type==="password"?"text":"password";
+}
+function ocupadasCuenta(c){
+  return clientes.filter(function(x){return x.activo!==false&&x.servicio===c.plataforma&&x.linea===c.linea;}).length;
+}
+function renderCuentas(){
+  document.getElementById("tabla-cuentas").innerHTML=cuentas.map(function(c){
+    var oc=ocupadasCuenta(c);
+    var tot=c.pantallas_totales||0;
+    var libres=tot-oc;
+    var visible=!!cuentaPassVisible[c.id];
+    return '<tr><td style="font-weight:600">'+c.plataforma+'</td><td>'+c.correo+'</td><td style="font-family:var(--font-mono);display:flex;align-items:center;gap:6px"><span>'+(visible?c.contrasena:"••••••••")+'</span><button class="btn sm" onclick="toggleRowPass(\''+c.id+'\')">'+(visible?"🙈":"👁")+'</button></td><td><span class="badge bt">'+c.linea+'</span></td><td class="b">'+tot+'</td><td class="r">'+oc+'</td><td class="'+(libres>0?"g":"r")+'">'+libres+'</td><td><button class="btn sm danger" onclick="delCuenta(\''+c.id+'\')">✕</button></td></tr>';
+  }).join()||'<tr><td colspan="8" class="empty">Sin cuentas registradas</td></tr>';
+}
+function toggleRowPass(id){
+  cuentaPassVisible[id]=!cuentaPassVisible[id];
+  renderCuentas();
+}
+async function addCuenta(){
+  var plataforma=document.getElementById("cu-plataforma").value;
+  var correo=document.getElementById("cu-correo").value.trim();
+  var pass=document.getElementById("cu-pass").value;
+  var pantallas=parseInt(document.getElementById("cu-pantallas").value)||0;
+  var linea=document.getElementById("cu-linea").value;
+  if(!correo||!pass||!pantallas){toast("Completa correo, contraseña y pantallas","err");return;}
+  var btn=document.getElementById("btn-add-cuenta");btn.disabled=true;
+  try{
+    var rec=await sb("cuentas","POST",{plataforma:plataforma,correo:correo,contrasena:pass,pantallas_totales:pantallas,linea:linea});
+    cuentas.unshift(rec[0]);
+    document.getElementById("cu-correo").value="";
+    document.getElementById("cu-pass").value="";
+    document.getElementById("cu-pantallas").value="";
+    renderCuentas();toast("✓ Cuenta registrada");
+  }catch(e){toast("Error: "+e.message,"err");}
+  btn.disabled=false;
+}
+async function delCuenta(id){
+  if(!confirm("¿Eliminar esta cuenta?"))return;
+  try{await sb("cuentas?id=eq."+id,"DELETE");cuentas=cuentas.filter(function(c){return c.id!==id;});renderCuentas();toast("Eliminado");}catch(e){toast("Error","err");}
+}
 
 // ===== RENOVACIONES =====
 function renderRenovaciones(){
