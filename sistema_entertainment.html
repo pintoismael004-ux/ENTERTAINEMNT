@@ -468,7 +468,7 @@ async function loadAll(){
       sb("clientes?order=creado_en.desc&limit=500"),
       sb("gastos_fijos?order=creado_en.asc"),
       sb("pedidos?order=creado_en.desc&limit=100"),
-      sb("cuentas?order=creado_en.desc&limit=500")
+      sb("cuentas?order=created_at.desc&limit=500")
     ]);
     movs=results[0];clientes=results[1];gastosFijos=results[2];pedidos=results[3];cuentas=results[4];
     setSyncStatus("ok","conectado");
